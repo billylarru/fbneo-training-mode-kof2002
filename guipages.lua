@@ -106,6 +106,28 @@ guielements = { -- some shorthands/parts of interactiveguipages that can be move
 						end
 					end,
 	},
+	directionset2 = {
+		text = "Set the direction P1 is holding",
+		info = "Allows you to set the direction P1 is holding",
+		func = function() CIG("setdirectionp1", 1) end,
+		olcolour = "black",
+		autofunc = 	function(this)
+						local str = "P1 holding "
+						for i, v in pairs(inputs.properties.p1hold) do
+							if v then
+								str = str .. i .. " "
+							end
+						end
+						str = str:sub(1, #str-1)
+						if #str > 11 then
+							this.text = str -- 124
+							this.x = 4 + (31-#str)*4
+						else
+							this.text = "Set the direction P1 is holding"
+							this.x = 4
+						end
+					end,
+	},
 	hitboxsettings = {
 		text = "Change hitbox settings",
 		x = 40,
@@ -554,6 +576,27 @@ guipages = { -- interactiveguipages
 			autofunc = 	function() displayStick(interactivegui.boxx + interactivegui.boxxlength/2 - 16, interactivegui.boxy + 55) end,
 		},
 	},
+	setdirectionp1 = {
+		left = guielements.falseleftarrow,
+		right = guielements.falserightarrow,
+		title = {
+			text = "Basic Settings",
+			x = interactivegui.boxxlength/2 - 30,
+			y = 1,
+		},
+		{
+			text = "",
+			x = -200, -- should be 'invisible'
+			y = -200,
+			func = 		function()
+							local a = function(b) if b then return 1 end return 0 end -- bool to num
+							local dir = 5+a(guiinputs.P1["up"])*3 + a(guiinputs.P1["left"])*-1 + a(guiinputs.P1["right"])*1 + a(guiinputs.P1["down"])*-3
+							setDirection(1, dir)
+							CIG(interactivegui.previouspage, interactivegui.previousselection)
+						end,
+			autofunc = 	function() displayStick(interactivegui.boxx + interactivegui.boxxlength/2 - 16, interactivegui.boxy + 55) end,
+		},
+	},
 	hitboxsettings = {
 		title = {
 			text = "Hitbox Settings",
@@ -572,6 +615,10 @@ guipages = { -- interactiveguipages
 -- All guipages elements should be enum'd
 if translationtable then -- if inputs can be processed
 	table.insert(guipages[1], guielements.directionset)
+end
+
+if translationtable then -- if inputs can be processed
+	table.insert(guipages[1], guielements.directionset2)
 end
 
 if hitboxesReg then -- if a hitbox file is loaded
