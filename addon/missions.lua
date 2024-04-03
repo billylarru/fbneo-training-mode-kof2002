@@ -1055,6 +1055,35 @@ input.registerhotkey(5, function()
 	end
 end)
 
+input.registerhotkey(6, function()
+		-- auto-save a mission from a replay
+		if (r_frame == 0) then
+			local mission_savestate = savestate.create("new_savestate")
+			savestate.save(mission_savestate)
+			recording.replayP1 = true
+			toggleRecording(nil, {})
+			recording.replayP1 = false
+			local txt1 = "RECORDING STARTED..."
+			local txt2 = "Press Alt+6 to stop recording and save the mission."
+			showTxt(480, txt1, txt2)
+			r_frame = emu.framecount()
+		else
+			toggleRecording(nil, {})
+			frame_end = emu.framecount()
+			local recorded = frame_end - r_frame
+			guipages.save_mission.frame.text = 150
+			guipages.save_mission.name.text = "REPLAY_"..r_frame
+			slot_buttons[1].text=1
+			slot_buttons[1].checked = true
+			saveMission()
+			local txt1 = "RECORDED "..recorded.." frames."
+			local txt2 = "To take over load: Add-On > Missions > REPLAY_"..r_frame
+			showTxt(480, txt1, txt2)
+			r_frame = 0
+		end
+
+end)
+
 local missions_checked_deletion = {} -- for deleting. Maybe I'm being overcautious for not merging the two tables though
 
 local function deleteMission()
